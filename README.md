@@ -16,27 +16,25 @@ This repository contains all files used in the video series on building an Arist
 This video walks you through installing OrbStack, configuring a Linux VM, allocating system memory, and installing ContainerLab along with Docker.
 
 Steps Covered
-	1.	Download OrbStack:
-https://orbstack.dev/download
-It auto-detects your OS and provides the correct installer.
+	1.	Download OrbStack: https://orbstack.dev/download, It auto-detects your OS and provides the correct installer.
 	2.	Install OrbStack and move it into Applications (Windows users follow the on-screen installer).
 	3.	When prompted to create a VM, choose Linux.
 	4.	If no Linux VM appears:
-	•	Go to Machines → New Machine
-	•	Name it ContainerLab
-	•	Choose Debian (default settings)
-	5.	Stop the VM → Right-click → Make Default
-	6.	Open OrbStack Settings → System → Memory Limit
-	•	Set VM memory to at least 8GB
-	•	More memory = more network devices
-	•	If memory is limited, you will rely on the delay setting inside your topology file.
-	7.	Start the VM and open its Terminal tab.
+	•	Machines → New Machine
+	•	Name: ContainerLab
+	•	Distribution: Debian (default)
+	5.	Stop the VM → Right-click → Make Default.
+	6.	Open OrbStack Settings → System → Memory Limit:
+	•	Set memory to at least 8GB
+	•	More memory = more devices
+	•	If memory is low, you’ll rely on the delay option inside the topology file
+	7.	Start the VM and open the Terminal tab.
 	8.	Install ContainerLab:
 
 curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"
 
 
-	9.	Verify tools:
+	9.	Verify installation:
 
 clab version
 docker --version
@@ -47,45 +45,44 @@ docker --version
 
 2. Connect VS Code to Your OrbStack VM & Mount a Local Folder
 
-This video teaches you how to connect VS Code to your OrbStack VM using Remote Explorer and properly mount a lightweight folder to avoid memory overhead.
+This video shows how to connect VS Code to your OrbStack VM using Remote Explorer and mount a local directory safely.
 
 Steps Covered
 	1.	Open VS Code.
-	2.	Install the Remote Explorer extension from Microsoft.
-	3.	A new sidebar icon appears for the extension.
-	4.	Click the bottom-left >< icon → Remote Window → SSH: Connect to Host
-Select orb.
-(If “orb” does not appear, confirm the VM is running.)
-	5.	Create a lightweight directory on your local system:
+	2.	Install the Remote Explorer extension (Microsoft).
+	3.	A new sidebar icon for Remote Explorer appears.
+	4.	Click the bottom-left >< icon → Remote Window → SSH: Connect to Host → select orb
+(If “orb” isn’t listed, ensure the VM is running.)
+	5.	Create a lightweight folder on your Mac/PC:
 Recommended: /Users/your_account/Labs
-	•	Avoid mounting heavy folders like Documents or Downloads — they consume excessive RAM.
-	•	Copy the Arista folder from this GitHub repository into Labs.
+	•	Avoid Documents or Downloads (too many nested files = RAM issues)
+	•	Copy the Arista folder from this GitHub repo into Labs
 	6.	In VS Code:
-	•	Go to the Explorer sidebar
-	•	Choose Open Folder
-	•	Remove the default Linux VM path
-	•	Type /Users/... to navigate to your local Labs folder
-	•	Select the folder and click OK
+	•	Open the Explorer sidebar
+	•	Click Open Folder
+	•	Clear the default Linux VM path
+	•	Type /Users/... and navigate to your Labs folder
+	•	Select it and click OK
 	7.	You are now mounted into the VM.
 Verify:
 
 clab version
 
 
-	8.	Download your Arista cEOS image (you’ll need it for the next video).
+	8.	Download your Arista cEOS image (needed for the next video).
 
 ⸻
 
 3. Create a Docker Image from the Arista cEOS File
 
-This video shows how to build the required Docker image from your cEOS image.
+This video explains how to take your cEOS file and import it as a Docker image for ContainerLab.
 
 Steps Covered
-	1.	Download your Arista cEOS image (must be obtained directly from Arista due to licensing).
-	2.	Place the file into:
+	1.	Download your Arista cEOS image (must be obtained directly from Arista).
+	2.	Place the downloaded file into:
 /Users/yourname/Labs/Arista/images
-	3.	Open VS Code, ensure you are connected to orb with the folder mounted.
-	4.	Confirm connectivity:
+	3.	Open VS Code and ensure you’re connected to orb with the local folder mounted.
+	4.	Verify the environment:
 
 clab version
 
@@ -93,12 +90,12 @@ clab version
 	5.	Build the Docker image:
 
 cd Arista
-ls -al      # confirm expected directory structure
+ls -al
 docker import images/cEOS ceos:4.30.1F
 
-	•	The tag (e.g., 4.30.1F) must match your downloaded cEOS version.
+	•	Replace 4.30.1F with your exact cEOS version
 
-	6.	Verify the imported image:
+	6.	Verify the new image:
 
 docker images
 
@@ -108,47 +105,47 @@ docker images
 
 4. Understanding the ContainerLab Topology File
 
-This video explains the structure of the topo.clab.yaml file and best practices for memory and configuration.
+This video walks through the structure and purpose of the topo.clab.yaml file.
 
 Topics Covered
-	•	File name: topo.clab.yaml
-	•	ContainerLab uses this file to build your lab.
+	•	Topology file: topo.clab.yaml
+	•	Used by ContainerLab to build the full lab
 	•	Three major sections:
 	1.	name
 	2.	mgmt
 	3.	topology
-	•	Memory and startup delay:
-	•	If VS Code disconnects, the VM may be out of RAM
-	•	Increase memory in OrbStack OR increase delay: in the topology file
-	•	The init-configs directory provides base switch configurations
-	•	Port forwarding is defined in the topology file to allow local access
-	•	Verification of link definitions and topology layout
+	•	Memory + startup delay:
+	•	If VS Code disconnects, your VM is likely out of RAM
+	•	Increase memory or increase the delay value
+	•	init-configs folder provides base switch configuration
+	•	Port forwarding allows local SSH access via localhost
+	•	Verification of links & node definitions
 
 ⸻
 
 5. Deploying the ContainerLab Topology
 
-This video walks through launching the lab using your topology file.
+This video shows how to launch the lab once your topology file and Docker image are ready.
 
 Steps Covered
-	1.	Stay in VS Code connected to orb.
-	2.	Confirm your local folder is mounted so ContainerLab can read the YAML file.
-	3.	Deploy with:
+	1.	Ensure VS Code is connected to orb.
+	2.	Confirm your local folder is mounted so ContainerLab can access topo.clab.yaml.
+	3.	Deploy the lab:
 
 sudo clab deploy -t topo.clab.yaml
 
 
-	4.	ContainerLab will:
-	•	Start the VM devices
-	•	Apply delay values to manage memory
-	•	Load your init-configs
-	•	Display a final table of device names and management IPs
-	5.	Once complete, access devices via:
+	4.	During deployment ContainerLab will:
+	•	Start devices
+	•	Apply delay settings
+	•	Load init-configs
+	•	Display a device table with management IP addresses
+	5.	Access devices using:
 	•	SecureCRT
 	•	Any SSH client
 	•	OrbStack CLI
-	•	localhost or 127.0.0.1 (thanks to port forwarding)
-	6.	Next video will cover accessing switches via SSH.
+	•	localhost or 127.0.0.1 (via port forwarding)
+	6.	The next video demonstrates several ways to SSH into the devices.
 
 ⸻
 
@@ -176,11 +173,11 @@ README.md
 
 🚀 Getting Started
 
-Follow the videos in order—each builds on the last.
+Follow the videos in order—each builds on the previous one:
 	1.	Install OrbStack & ContainerLab
-	2.	Connect VS Code and mount local folder
-	3.	Create Docker image from cEOS
-	4.	Review topology file
+	2.	Connect VS Code and mount your local folder
+	3.	Import the Docker image for cEOS
+	4.	Review the topology file
 	5.	Deploy your lab
 
 ⸻
@@ -188,12 +185,12 @@ Follow the videos in order—each builds on the last.
 👍 Support the Project
 
 If you’re learning from this series, consider liking or subscribing on YouTube.
-Open issues or discussion threads here if you need help.
+Feel free to open issues or discussions here on GitHub if you need help.
 
 ⸻
 
-If you’d like, I can also:
-✅ Add a Table of Contents
-✅ Add badges (YouTube, GitHub Repo, etc.)
-✅ Add screenshots or diagrams
-Just tell me!
+If you’d like:
+✅ A Table of Contents
+✅ GitHub badges
+✅ Screenshots / diagrams
+Just tell me—I can generate them!
